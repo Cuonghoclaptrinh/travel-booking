@@ -39,7 +39,7 @@ import { TourImage } from 'src/modules/tours/entities/tour-image.entity';
                     entities: [User, Role, Permission, UserRole, RolePermission, Destination, Amenity,
                         DestinationImage, Hotel, HotelImage, HotelAmenity, RoomType, Tour, TourPackage,
                         TourDeparture, DepartureOption, Booking, PaymentTransaction, TourImage],
-                    synchronize: true,
+                    synchronize: false,
                     logging: true,
                     autoLoadEntities: false,
                 });
