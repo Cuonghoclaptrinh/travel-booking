@@ -1,0 +1,21 @@
+import { Type } from 'class-transformer';
+import { IsInt, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+
+export class QueryRoleDto {
+    @IsOptional()
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    page = 1;
+
+    @IsOptional()
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    limit = 10;
+
+    @IsOptional()
+    @IsString()
+    @MaxLength(255)
+    keyword?: string;
+}

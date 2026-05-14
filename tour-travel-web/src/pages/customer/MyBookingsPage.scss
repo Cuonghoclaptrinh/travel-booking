@@ -1,0 +1,830 @@
+// ═══════════════════════════════════════════════════════
+// VARIABLES
+// ═══════════════════════════════════════════════════════
+
+$primary-color: #0f766e;
+$primary-light: #14b8a6;
+$primary-dark: #0f4f4a;
+
+$success-color: #059669;
+$warning-color: #d97706;
+$danger-color: #dc2626;
+$info-color: #0284c7;
+
+$bg-gradient: linear-gradient(135deg, #0f766e 0%, #14b8a6 52%, #0284c7 100%);
+
+$card-shadow: 0 4px 20px rgba(15, 118, 110, 0.08);
+$card-shadow-hover: 0 8px 30px rgba(15, 118, 110, 0.14);
+
+$border-radius: 16px;
+$border-radius-sm: 12px;
+$spacing: 24px;
+// ═══════════════════════════════════════════════════════
+// MIXINS
+// ═══════════════════════════════════════════════════════
+
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin card-hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: $card-shadow-hover;
+}
+
+@mixin gradient-text($gradient) {
+    background: $gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+// ═══════════════════════════════════════════════════════
+// PAGE CONTAINER
+// ═══════════════════════════════════════════════════════
+
+.my-bookings-page {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top right, rgba(20, 184, 166, 0.14), transparent 32%),
+        radial-gradient(circle at bottom left, rgba(2, 132, 199, 0.10), transparent 30%),
+        linear-gradient(135deg, #f0fdfa 0%, #ecfeff 48%, #f8fafc 100%);
+    padding: $spacing;
+
+    @media (max-width: 768px) {
+        padding: 16px;
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// HERO HEADER
+// ═══════════════════════════════════════════════════════
+
+.page-hero {
+    margin-bottom: $spacing * 1.5;
+    background:
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 30%),
+        linear-gradient(135deg, #0f4f4a 0%, #0f766e 55%, #0284c7 100%);
+    border-radius: $border-radius;
+    padding: 48px;
+    box-shadow: $card-shadow;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -10%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+
+    &__content {
+        position: relative;
+        z-index: 1;
+    }
+
+    &__text {
+        margin-bottom: 32px;
+    }
+
+    &__title {
+        color: white !important;
+        font-size: 42px !important;
+        font-weight: 700 !important;
+        margin-bottom: 12px !important;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        @media (max-width: 768px) {
+            font-size: 32px !important;
+        }
+    }
+
+    &__icon {
+        font-size: 48px;
+        animation: bounce 2s infinite;
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    }
+
+    &__description {
+        color: rgba(255, 255, 255, 0.9) !important;
+        font-size: 18px !important;
+        margin: 0 !important;
+    }
+
+    &__stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+
+        @media (max-width: 768px) {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        padding: 32px 24px;
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// STAT CARDS
+// ═══════════════════════════════════════════════════════
+
+.stat-card {
+    background: white;
+    padding: 24px;
+    border-radius: $border-radius-sm;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    :global {
+        .ant-statistic-title {
+            font-size: 14px;
+            color: #8c8c8c;
+            margin-bottom: 8px;
+        }
+
+        .ant-statistic-content {
+            font-size: 28px;
+            font-weight: 700;
+        }
+    }
+
+    &--primary :global .ant-statistic-content {
+        color: $primary-color;
+    }
+
+    &--success :global .ant-statistic-content {
+        color: $success-color;
+    }
+
+    &--warning :global .ant-statistic-content {
+        color: $warning-color;
+    }
+
+    &--info :global .ant-statistic-content {
+        color: $info-color;
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// FILTER SECTION
+// ═══════════════════════════════════════════════════════
+
+.filter-section {
+    margin-bottom: $spacing;
+    border-radius: $border-radius;
+    box-shadow: $card-shadow;
+    border: none !important;
+
+    :global .ant-card-body {
+        padding: 24px;
+    }
+
+    &__header {
+        margin-bottom: 20px;
+    }
+
+    &__title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 18px;
+        color: #262626;
+
+        :global .anticon {
+            font-size: 20px;
+            color: $primary-color;
+        }
+    }
+
+    &__content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+
+        @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+        }
+    }
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #595959;
+}
+
+.filter-select {
+    width: 100%;
+
+    :global {
+        .ant-select-selector {
+            border-radius: 8px !important;
+            border: 2px solid #f0f0f0 !important;
+            transition: all 0.3s ease;
+
+            &:hover {
+                border-color: $primary-color !important;
+            }
+        }
+
+        &.ant-select-focused .ant-select-selector {
+            border-color: $primary-color !important;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1) !important;
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// BOOKINGS CONTENT
+// ═══════════════════════════════════════════════════════
+
+.bookings-content {
+    margin-top: $spacing;
+}
+
+.bookings-header {
+    margin-bottom: 20px;
+}
+
+.bookings-count {
+    font-size: 16px;
+    color: #595959;
+
+    strong {
+        color: $primary-color;
+        font-size: 18px;
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// BOOKING CARD
+// ═══════════════════════════════════════════════════════
+
+.booking-card-wrapper {
+    animation: fadeInUp 0.6s ease-out backwards;
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+
+.booking-card {
+    height: 100%;
+    border-radius: $border-radius !important;
+    box-shadow: $card-shadow !important;
+    border: none !important;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #0f766e 0%, #14b8a6 55%, #0284c7 100%);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    &:hover {
+        @include card-hover;
+
+        &::before {
+            transform: scaleX(1);
+        }
+
+        .booking-card__icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .booking-card__action {
+            border-radius: 10px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, $primary-color 0%, $primary-light 100%) !important;
+            border: none !important;
+            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.22);
+
+            &:hover {
+                background: linear-gradient(135deg, $primary-dark 0%, $primary-color 100%) !important;
+                box-shadow: 0 6px 16px rgba(15, 118, 110, 0.30);
+            }
+        }
+    }
+
+    :global .ant-card-body {
+        padding: 24px;
+    }
+
+    // Ribbon
+    &__ribbon {
+        position: absolute;
+        top: 12px;
+        right: -8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 16px 6px 12px;
+        border-radius: 20px 0 0 20px;
+        font-size: 12px;
+        font-weight: 600;
+        color: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        z-index: 1;
+
+        :global .anticon {
+            font-size: 14px;
+        }
+    }
+
+    // Header
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    &__icon {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        :global .ant-avatar {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+    }
+
+    &__code {
+        flex: 1;
+
+        &-label {
+            display: block;
+            font-size: 12px;
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+
+        &-value {
+            display: block;
+            font-size: 16px;
+            color: #262626;
+            font-weight: 600;
+        }
+    }
+
+    // Tour
+    &__tour {
+        margin-bottom: 20px;
+        min-height: 48px;
+
+        &-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            line-height: 1.5;
+            margin: 0 !important;
+        }
+    }
+
+    // Info grid
+    &__info {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+
+        &-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            background: linear-gradient(135deg, #f0fdfa 0%, #ecfeff 100%);
+            border: 1px solid rgba(15, 118, 110, 0.10);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+
+            &:hover {
+                background: linear-gradient(135deg, #ccfbf1 0%, #e0f2fe 100%);
+                transform: translateY(-2px);
+            }
+
+            &--full {
+                grid-column: 1 / -1;
+            }
+        }
+
+        &-icon {
+            @include flex-center;
+            width: 32px;
+            height: 32px;
+            background: white;
+            border-radius: 8px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+            :global .anticon {
+                font-size: 16px;
+                color: $primary-color;
+            }
+        }
+
+        &-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        &-label {
+            display: block;
+            font-size: 12px;
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+
+        &-value {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #262626;
+
+            &--price {
+                color: $success-color;
+                font-size: 16px;
+            }
+        }
+    }
+
+    // Footer
+    &__footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding-top: 16px;
+        border-top: 2px dashed #f0f0f0;
+    }
+
+    &__tag {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 16px;
+        border: none;
+    }
+
+    &__action {
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+
+        &:hover {
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// EMPTY STATE
+// ═══════════════════════════════════════════════════════
+
+.empty-state {
+    border-radius: $border-radius !important;
+    box-shadow: $card-shadow !important;
+    border: none !important;
+
+    :global {
+        .ant-card-body {
+            padding: 64px 24px;
+        }
+
+        .ant-empty-image {
+            margin-bottom: 24px;
+        }
+
+        .ant-btn-lg {
+            height: 48px;
+            padding: 0 32px;
+            font-size: 16px;
+            border-radius: 24px;
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(24, 144, 255, 0.4);
+            }
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// SKELETON
+// ═══════════════════════════════════════════════════════
+
+.booking-card-skeleton {
+    height: 100%;
+    border-radius: $border-radius !important;
+    box-shadow: $card-shadow !important;
+    border: none !important;
+}
+
+// ═══════════════════════════════════════════════════════
+// RESPONSIVE
+// ═══════════════════════════════════════════════════════
+
+@media (max-width: 768px) {
+    .booking-card {
+        &__info {
+            grid-template-columns: 1fr;
+
+            &-item--full {
+                grid-column: 1;
+            }
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// ANIMATIONS
+// ═══════════════════════════════════════════════════════
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════
+
+.loading-shimmer {
+    animation: shimmer 2s infinite;
+    background: linear-gradient(to right,
+            #f0f0f0 0%,
+            #e0e0e0 20%,
+            #f0f0f0 40%,
+            #f0f0f0 100%);
+    background-size: 1000px 100%;
+}
+
+// FIX BOOKING CARD RESPONSIVE
+.booking-card {
+    min-width: 0;
+
+    :global .ant-card-body {
+        padding: 24px;
+    }
+
+    &__header {
+        align-items: flex-start;
+        padding-right: 90px; // tránh mã booking bị đè bởi ribbon trạng thái
+    }
+
+    &__code {
+        min-width: 0;
+    }
+
+    &__code-value {
+        display: block;
+        font-size: 16px;
+        line-height: 1.35;
+        word-break: break-word;
+    }
+
+    &__ribbon {
+        max-width: 120px;
+        white-space: nowrap;
+    }
+
+    &__tour-name {
+        word-break: break-word;
+    }
+
+    &__info-item {
+        min-width: 0;
+    }
+
+    &__info-content {
+        min-width: 0;
+    }
+
+    &__info-label {
+        white-space: nowrap;
+    }
+
+    &__info-value {
+        white-space: nowrap;
+        word-break: keep-all;
+        overflow-wrap: normal;
+    }
+
+    &__info-value--price {
+        font-size: 15px;
+        line-height: 1.3;
+    }
+
+    &__footer {
+        flex-wrap: wrap;
+    }
+
+    &__tag {
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+// Từ tablet nhỏ trở xuống: info chuyển thành 1 cột để không vỡ chữ
+@media (max-width: 992px) {
+    .booking-card {
+        &__info {
+            grid-template-columns: 1fr;
+        }
+
+        &__info-item--full {
+            grid-column: 1;
+        }
+    }
+}
+
+// Mobile: giảm padding, icon, font để gọn hơn
+@media (max-width: 576px) {
+    .my-bookings-page {
+        padding: 12px;
+    }
+
+    .booking-card {
+        :global .ant-card-body {
+            padding: 18px;
+        }
+
+        &__header {
+            gap: 12px;
+            padding-right: 76px;
+        }
+
+        &__icon {
+            :global .ant-avatar {
+                width: 46px !important;
+                height: 46px !important;
+                line-height: 46px !important;
+            }
+        }
+
+        &__ribbon {
+            top: 10px;
+            right: -6px;
+            max-width: 105px;
+            padding: 5px 12px 5px 10px;
+            font-size: 11px;
+        }
+
+        &__code-value {
+            font-size: 15px;
+        }
+
+        &__tour-name {
+            font-size: 15px;
+        }
+
+        &__info-item {
+            padding: 12px;
+            align-items: center;
+        }
+
+        &__info-value--price {
+            font-size: 15px;
+        }
+
+        &__footer {
+            align-items: center;
+        }
+
+        &__action {
+            flex: 1;
+            min-width: 120px;
+        }
+    }
+}
+
+.bookings-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 28px;
+
+    .ant-pagination {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .ant-pagination-item {
+        border-radius: 10px;
+        border-color: rgba(15, 118, 110, 0.16);
+        transition: all 0.2s ease;
+
+        a {
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        &:hover {
+            border-color: $primary-color;
+
+            a {
+                color: $primary-color;
+            }
+        }
+    }
+
+    .ant-pagination-item-active {
+        border-color: $primary-color;
+        background: #f0fdfa;
+
+        a {
+            color: $primary-color;
+            font-weight: 800;
+        }
+    }
+
+    .ant-pagination-prev,
+    .ant-pagination-next {
+        .ant-pagination-item-link {
+            border-radius: 10px;
+            border-color: rgba(15, 118, 110, 0.16);
+            color: $primary-color;
+        }
+
+        &:hover .ant-pagination-item-link {
+            border-color: $primary-color;
+            color: $primary-color;
+        }
+    }
+
+    .ant-pagination-disabled {
+        .ant-pagination-item-link {
+            color: #9ca3af;
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+    }
+}

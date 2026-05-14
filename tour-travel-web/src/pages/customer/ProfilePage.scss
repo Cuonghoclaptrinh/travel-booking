@@ -1,0 +1,395 @@
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+
+// ── Variables ──────────────────────────────────────────────────────────────
+$primary: #1a3c5e;
+$primary-light: #2a5f96;
+$accent: #e8a020;
+$success: #1a7a5e;
+$danger: #b8303a;
+$surface: #ffffff;
+$surface-2: #f7f8fb;
+$border: #e2e6ed;
+$text-main: #1a2636;
+$text-sub: #5a6a7e;
+$text-muted: #9aa5b4;
+$radius-sm: 8px;
+$radius-md: 14px;
+$radius-lg: 20px;
+$shadow-card: 0 4px 24px rgba(26, 60, 94, 0.08), 0 1px 4px rgba(26, 60, 94, 0.04);
+$shadow-hover: 0 8px 40px rgba(26, 60, 94, 0.13);
+
+// ── Page wrapper ───────────────────────────────────────────────────────────
+.pf-page {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(145deg, #f0f4fa 0%, #e8eef8 100%);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 16px 80px;
+    position: relative;
+
+    &::before {
+        content: '';
+        position: fixed;
+        top: -100px;
+        right: -100px;
+        width: 420px;
+        height: 420px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba($primary-light, .09) 0%, transparent 70%);
+        pointer-events: none;
+    }
+}
+
+// ── Card ───────────────────────────────────────────────────────────────────
+.pf-card {
+    width: 100%;
+    max-width: 600px;
+    background: $surface;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-card;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+    transition: box-shadow .3s;
+
+    &:hover {
+        box-shadow: $shadow-hover;
+    }
+}
+
+// ── Card header ────────────────────────────────────────────────────────────
+.pf-card-header {
+    background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
+    padding: 28px 32px;
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+        content: '';
+        position: absolute;
+        right: -50px;
+        bottom: -50px;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .05);
+        pointer-events: none;
+    }
+}
+
+.pf-header-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, .6);
+    margin-bottom: 4px;
+}
+
+.pf-header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+}
+
+// ── Avatar section ─────────────────────────────────────────────────────────
+.pf-avatar-section {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 28px 32px 20px;
+    border-bottom: 1.5px solid $border;
+    flex-wrap: wrap;
+}
+
+.pf-avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.pf-avatar {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid $border;
+    display: block;
+    transition: border-color .2s;
+
+    &:hover {
+        border-color: $primary-light;
+    }
+}
+
+.pf-avatar-fallback {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    border: 3px solid $border;
+    user-select: none;
+}
+
+.pf-avatar-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba($primary, .45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity .2s;
+
+    svg {
+        color: #fff;
+    }
+
+    .pf-avatar-wrap:hover & {
+        opacity: 1;
+    }
+}
+
+.pf-avatar-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pf-avatar-name {
+    font-size: 17px;
+    font-weight: 600;
+    color: $text-main;
+    margin-bottom: 2px;
+}
+
+.pf-avatar-email {
+    font-size: 13px;
+    color: $text-muted;
+    margin-bottom: 8px;
+}
+
+// ── Form body ──────────────────────────────────────────────────────────────
+.pf-form {
+    padding: 28px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.pf-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    &__label {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+        color: $text-sub;
+    }
+
+    &__input {
+        font-family: 'Be Vietnam Pro', sans-serif;
+        font-size: 14.5px;
+        color: $text-main;
+        background: $surface;
+        border: 1.5px solid $border;
+        border-radius: $radius-sm;
+        padding: 11px 14px;
+        outline: none;
+        transition: border-color .18s, box-shadow .18s;
+        width: 100%;
+        box-sizing: border-box;
+
+        &::placeholder {
+            color: $text-muted;
+        }
+
+        &:focus {
+            border-color: $primary-light;
+            box-shadow: 0 0 0 3px rgba($primary-light, .12);
+        }
+
+        &:disabled {
+            background: $surface-2;
+            color: $text-muted;
+            cursor: not-allowed;
+        }
+    }
+
+    &__hint {
+        font-size: 11.5px;
+        color: $text-muted;
+    }
+}
+
+// ── Alerts ─────────────────────────────────────────────────────────────────
+.pf-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: $radius-sm;
+    font-size: 13.5px;
+    font-weight: 500;
+    animation: pf-fadein .25s ease;
+
+    &--error {
+        background: rgba($danger, .07);
+        border: 1.5px solid rgba($danger, .25);
+        color: $danger;
+    }
+
+    &--success {
+        background: rgba($success, .07);
+        border: 1.5px solid rgba($success, .25);
+        color: $success;
+    }
+
+    &__icon {
+        font-size: 16px;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+}
+
+@keyframes pf-fadein {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// ── Buttons ────────────────────────────────────────────────────────────────
+.pf-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 99px;
+    border: none;
+    cursor: pointer;
+    transition: all .22s ease;
+    white-space: nowrap;
+
+    &--primary {
+        background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
+        color: #fff;
+        box-shadow: 0 4px 14px rgba($primary, .28);
+
+        &:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba($primary, .38);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+
+    &--outlined {
+        background: $surface;
+        color: $primary;
+        border: 1.5px solid rgba($primary, .35);
+
+        &:hover:not(:disabled) {
+            border-color: $primary;
+            background: rgba($primary, .05);
+            transform: translateY(-1px);
+        }
+    }
+
+    &--danger-ghost {
+        background: transparent;
+        color: $danger;
+        border: 1.5px solid rgba($danger, .3);
+
+        &:hover:not(:disabled) {
+            background: $danger;
+            color: #fff;
+            border-color: $danger;
+            box-shadow: 0 4px 12px rgba($danger, .25);
+            transform: translateY(-1px);
+        }
+    }
+
+    &:disabled {
+        opacity: .5;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+
+    &__spinner {
+        width: 13px;
+        height: 13px;
+        border: 2px solid rgba(255, 255, 255, .35);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: pf-spin .7s linear infinite;
+    }
+
+    &__spinner--dark {
+        border-color: rgba($primary, .25);
+        border-top-color: $primary;
+    }
+}
+
+@keyframes pf-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+// ── Footer ─────────────────────────────────────────────────────────────────
+.pf-form-footer {
+    padding-top: 4px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+// ── Responsive ─────────────────────────────────────────────────────────────
+@media (max-width: 560px) {
+    .pf-page {
+        padding: 24px 10px 60px;
+    }
+
+    .pf-card-header {
+        padding: 20px;
+    }
+
+    .pf-avatar-section {
+        padding: 20px;
+        gap: 16px;
+    }
+
+    .pf-form {
+        padding: 20px;
+        gap: 16px;
+    }
+
+    .pf-header-title {
+        font-size: 22px;
+    }
+}

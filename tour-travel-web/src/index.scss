@@ -1,0 +1,22 @@
+@use '../src/styles/abstracts/variables' as *;
+@use '../src/styles/abstracts/mixins' as *;
+@use '../src/styles/base/reset';
+@use '../src/styles/base/typography';
+@use '../src/styles/base/global';
+@use '../src/styles/vendors/mui-overrides';
+@use '../src/styles/vendors/antd-overrides';
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: Inter, Arial, sans-serif;
+}

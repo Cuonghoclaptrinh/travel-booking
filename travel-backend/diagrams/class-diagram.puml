@@ -1,0 +1,107 @@
+@startuml
+title Biểu đồ lớp hệ thống đặt tour du lịch trực tuyến
+left to right direction
+hide circle
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+skinparam class {
+    BackgroundColor #F8FBFF
+    BorderColor #2F5597
+    ArrowColor #2F5597
+}
+
+class User {
+    +id: number
+    +name: string
+    +email: string
+    +phone: string
+}
+
+class Role {
+    +id: number
+    +name: string
+}
+
+class Permission {
+    +id: number
+    +code: string
+    +name: string
+}
+
+class Destination {
+    +id: number
+    +name: string
+    +slug: string
+    +description: string
+}
+
+class Tour {
+    +id: number
+    +name: string
+    +slug: string
+    +durationDays: number
+    +durationNights: number
+    +status: string
+}
+
+class TourPackage {
+    +id: number
+    +name: string
+    +priceAdult: decimal
+    +priceChild: decimal
+    +status: string
+}
+
+class TourDeparture {
+    +id: number
+    +departureDate: Date
+    +returnDate: Date
+    +capacity: number
+    +bookedSlots: number
+    +status: string
+}
+
+class DepartureOption {
+    +id: number
+    +departureCity: string
+    +transportType: string
+    +extraFee: decimal
+}
+
+class Booking {
+    +id: number
+    +bookingCode: string
+    +contactName: string
+    +contactEmail: string
+    +contactPhone: string
+    +adultCount: number
+    +childCount: number
+    +totalAmount: decimal
+    +bookingStatus: string
+    +paymentStatus: string
+}
+
+class PaymentTransaction {
+    +id: number
+    +provider: string
+    +transactionRef: string
+    +amount: decimal
+    +status: string
+}
+
+User "1" -- "N" Booking
+Destination "1" -- "N" Tour 
+Tour "1" -- "N" TourPackage 
+Tour "1" -- "N" TourDeparture
+TourDeparture "1" -- "N" DepartureOption
+Tour "1" -- "N" Booking 
+TourPackage "1" -- "N" Booking 
+TourDeparture "1" -- "N" Booking 
+DepartureOption "1" -- "N" Booking
+Booking "1" -- "N" PaymentTransaction 
+
+User "0..*" -- "N" Role 
+Role "0..*" -- "N" Permission 
+
+@enduml

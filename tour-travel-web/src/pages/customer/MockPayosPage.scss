@@ -1,0 +1,171 @@
+.mock-payos-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #eef6ff, #f8fafc);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+}
+
+.mock-payos-card {
+    width: 100%;
+    max-width: 520px;
+    background: #fff;
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.14);
+    text-align: center;
+}
+
+.mock-payos-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: #00b14f;
+    color: #fff;
+    font-weight: 900;
+    margin-bottom: 18px;
+}
+
+.mock-payos-card h1 {
+    margin: 0;
+    font-size: 28px;
+    color: #0f172a;
+}
+
+.mock-payos-desc {
+    color: #64748b;
+    line-height: 1.6;
+    margin: 14px 0 24px;
+}
+
+.mock-payos-qr {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.mock-payos-qr__box {
+    width: 180px;
+    height: 180px;
+    border-radius: 18px;
+    background:
+        linear-gradient(90deg, #0f172a 10px, transparent 10px) 0 0 / 28px 28px,
+        linear-gradient(#0f172a 10px, transparent 10px) 0 0 / 28px 28px,
+        #fff;
+    border: 10px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mock-payos-qr__box span {
+    background: #00b14f;
+    color: #fff;
+    font-weight: 900;
+    border-radius: 999px;
+    padding: 10px 14px;
+}
+
+.mock-payos-info {
+    background: #f8fafc;
+    border-radius: 18px;
+    padding: 16px;
+    text-align: left;
+    margin-bottom: 24px;
+}
+
+.mock-payos-info div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.mock-payos-info div:last-child {
+    border-bottom: 0;
+}
+
+.mock-payos-info span {
+    color: #64748b;
+}
+
+.mock-payos-info strong {
+    color: #0f172a;
+    text-align: right;
+    word-break: break-all;
+}
+
+.mock-payos-actions {
+    display: grid;
+    gap: 12px;
+}
+
+.mock-payos-btn {
+    border: 0;
+    border-radius: 14px;
+    height: 48px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.mock-payos-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.mock-payos-btn--primary {
+    background: #00b14f;
+    color: #fff;
+}
+
+.mock-payos-btn--primary:hover:not(:disabled) {
+    background: #009944;
+}
+
+.mock-payos-btn--ghost {
+    background: #eef2f7;
+    color: #0f172a;
+}
+
+.mock-payos-btn--ghost:hover:not(:disabled) {
+    background: #e2e8f0;
+}
+
+.mock-payos-success-card {
+    text-align: center;
+}
+
+.mock-payos-success-info {
+    margin-top: 24px;
+}
+
+.mock-payos-status-success {
+    color: #16a34a;
+}
+
+.mock-payos-success-card {
+    .ant-result {
+        padding: 16px 0 8px;
+    }
+
+    .ant-result-title {
+        font-weight: 700;
+    }
+
+    .ant-result-subtitle {
+        color: #666;
+        line-height: 1.6;
+    }
+
+    .ant-result-extra {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+}

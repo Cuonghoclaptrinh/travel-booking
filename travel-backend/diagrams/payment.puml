@@ -1,0 +1,116 @@
+@startuml
+title Biểu đồ lớp module tích hợp thanh toán PayOS
+
+left to right direction
+hide circle
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam nodesep 60
+skinparam ranksep 70
+
+package "Entity" {
+
+  class User {
+    +id: bigint
+    +name: string
+    +email: string
+  }
+
+  class Tour {
+    +id: bigint
+    +name: string
+    +status: string
+  }
+
+  class TourDeparture {
+    +id: bigint
+    +departureDate: date
+    +capacity: int
+    +bookedSlots: int
+  }
+
+  class Booking {
+    +id: bigint
+    +bookingCode: string
+    +totalAmount: decimal
+    +bookingStatus: string
+    +paymentStatus: string
+  }
+
+  class PaymentTransaction {
+    +id: bigint
+    +provider: string
+    +status: string
+    +transactionRef: string
+    +amount: decimal
+    +paymentUrl: string
+  }
+
+  User -[hidden]down- Tour
+  Tour -[hidden]down- TourDeparture
+  TourDeparture -[hidden]down- Booking
+  Booking -[hidden]down- PaymentTransaction
+}
+
+package "Service" {
+
+  class BookingsService {
+    +createBooking()
+    +checkAvailableSlots()
+    +updateBookingPaymentStatus()
+  }
+
+  class PaymentsController {
+    +createPayosPayment()
+    +handlePayosWebhook()
+  }
+
+  class PaymentsService {
+    +createPayosPayment()
+    +updatePaymentResult()
+  }
+
+  class PayosService {
+    +createPaymentLink()
+    +verifyPaymentData()
+  }
+
+  BookingsService -[hidden]down- PaymentsController
+  PaymentsController -[hidden]down- PaymentsService
+  PaymentsService -[hidden]down- PayosService
+}
+
+class PayOSGateway {
+  +createPaymentLink()
+  +returnPaymentResult()
+}
+
+'========================
+' Quan hệ entity
+'========================
+User "1" -- "0..*" Booking : tạo
+Tour "1" -- "0..*" Booking : được đặt
+TourDeparture "1" -- "0..*" Booking : thuộc lịch
+Booking "1" -- "0..*" PaymentTransaction : phát sinh
+
+'========================
+' Quan hệ service
+'========================
+BookingsService ..> Booking : quản lý
+BookingsService ..> TourDeparture : kiểm tra chỗ
+
+PaymentsController ..> PaymentsService : gọi
+PaymentsService ..> Booking : cập nhật
+PaymentsService ..> PaymentTransaction : quản lý
+PaymentsService ..> PayosService : sử dụng
+PayosService ..> PayOSGateway : gọi API
+
+'========================
+' Ép bố cục
+'========================
+PaymentTransaction -[hidden]right- BookingsService
+PayosService -[hidden]down- PayOSGateway
+
+@enduml

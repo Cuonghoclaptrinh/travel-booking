@@ -1,0 +1,40 @@
+@startuml
+left to right direction
+skinparam actorStyle awesome
+
+actor "Khách hàng" as Customer
+actor "Quản trị viên" as Admin
+actor "PayOS" as PayOS
+
+rectangle "Module tích hợp thanh toán PayOS" {
+  usecase "Đăng nhập" as UC_Login
+  usecase "Tạo booking\nchờ thanh toán" as UC_Booking
+  usecase "Thanh toán\nqua PayOS" as UC_Payment
+  usecase "Xem kết quả\nthanh toán" as UC_Result
+  usecase "Tạo link/QR\nthanh toán" as UC_CreateLink
+  usecase "Nhận kết quả\nthanh toán" as UC_Callback
+  usecase "Cập nhật trạng thái\nbooking/payment" as UC_Update
+  usecase "Xem danh sách giao dịch\nthanh toán" as UC_AdminList
+  usecase "Xem trạng thái booking/\nthanh toán" as UC_AdminStatus
+}
+
+Customer --> UC_Login
+Customer --> UC_Booking
+Customer --> UC_Payment
+Customer --> UC_Result
+
+Admin --> UC_AdminList
+Admin --> UC_AdminStatus
+
+PayOS --> UC_CreateLink
+PayOS --> UC_Callback
+
+UC_Payment .> UC_Login : <<include>>
+UC_Payment .> UC_CreateLink : <<include>>
+UC_Payment .> UC_Callback : <<include>>
+UC_Payment .> UC_Update : <<include>>
+
+UC_Result .> UC_Callback : <<extend>>
+UC_AdminStatus .> UC_Update : <<extend>>
+
+@enduml

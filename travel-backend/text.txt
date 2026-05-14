@@ -1,0 +1,788 @@
+export class CreateHotelAmenityDto { }
+import { Type } from 'class-transformer';
+import { ArrayUnique, IsArray, IsInt, Min } from 'class-validator';
+
+export class ReplaceHotelAmenitiesDto {
+    @IsArray()
+    @ArrayUnique()
+    @Type(() => Number)
+    @IsInt({ each: true })
+    @Min(1, { each: true })
+    amenityIds!: number[];
+}
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateHotelAmenityDto } from './create-hotel-amenity.dto';
+
+export class UpdateHotelAmenityDto extends PartialType(CreateHotelAmenityDto) {}
+
+import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Hotel } from 'src/modules/hotels/entities/hotel.entity';
+import { Amenity } from 'src/modules/amenities/entities/amenity.entity';
+
+@Entity({ name: 'hotel_amenities' })
+export class HotelAmenity {
+    @PrimaryColumn({ name: 'hotel_id', type: 'bigint', unsigned: true })
+    hotelId!: number;
+
+    @PrimaryColumn({ name: 'amenity_id', type: 'bigint', unsigned: true })
+    amenityId!: number;
+
+    @ManyToOne(() => Hotel, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'hotel_id' })
+    hotel!: Hotel;
+
+    @ManyToOne(() => Amenity, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'amenity_id' })
+    amenity!: Amenity;
+}
+
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
+
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { HotelAmenitiesService } from './hotel-amenities.service';
+import { ReplaceHotelAmenitiesDto } from './dto/replace-hotel-amenities.dto';
+
+@Controller()
+export class HotelAmenitiesController {
+  constructor(private readonly hotelAmenitiesService: HotelAmenitiesService) { }
+
+  @Get('hotels/:hotelId/amenities')
+  getByHotel(@Param('hotelId', ParseIntPipe) hotelId: number) {
+    return this.hotelAmenitiesService.getByHotel(hotelId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('admin/hotels/:hotelId/amenities')
+  replaceAmenities(
+    @Param('hotelId', ParseIntPipe) hotelId: number,
+    @Body() dto: ReplaceHotelAmenitiesDto,
+  ) {
+    return this.hotelAmenitiesService.replaceAmenities(hotelId, dto.amenityIds);
+  }
+}
+
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
+
+import { HotelAmenity } from './entities/hotel-amenity.entity';
+import { Hotel } from '../hotels/entities/hotel.entity';
+import { Amenity } from '../amenities/entities/amenity.entity';
+
+@Injectable()
+export class HotelAmenitiesService {
+  constructor(
+    @InjectRepository(HotelAmenity)
+    private readonly hotelAmenityRepository: Repository<HotelAmenity>,
+
+    @InjectRepository(Hotel)
+    private readonly hotelRepository: Repository<Hotel>,
+
+    @InjectRepository(Amenity)
+    private readonly amenityRepository: Repository<Amenity>,
+  ) { }
+
+  private async ensureHotelExists(hotelId: number) {
+    const hotel = await this.hotelRepository.findOne({
+      where: { id: hotelId },
+      select: ['id', 'name'],
+    });
+
+    if (!hotel) {
+      throw new NotFoundException('Khách sạn không tồn tại');
+    }
+
+    return hotel;
+  }
+
+  async getByHotel(hotelId: number) {
+    await this.ensureHotelExists(hotelId);
+
+    return this.hotelAmenityRepository.find({
+      where: { hotelId },
+      relations: {
+        amenity: true,
+      },
+      order: {
+        amenityId: 'DESC',
+      },
+    });
+  }
+
+  async replaceAmenities(hotelId: number, amenityIds: number[]) {
+    await this.ensureHotelExists(hotelId);
+
+    const uniqueIds = [...new Set(amenityIds)];
+
+    if (uniqueIds.length > 0) {
+      const amenities = await this.amenityRepository.find({
+        where: { id: In(uniqueIds) },
+        select: ['id'],
+      });
+
+      if (amenities.length !== uniqueIds.length) {
+        throw new BadRequestException('Có tiện ích không tồn tại');
+      }
+    }
+
+    await this.hotelAmenityRepository.delete({ hotelId });
+
+    if (uniqueIds.length === 0) {
+      return {
+        message: 'Cập nhật tiện ích khách sạn thành công',
+        data: [],
+      };
+    }
+
+    const payload = uniqueIds.map((amenityId) => ({
+      hotelId,
+      amenityId,
+    }));
+
+    await this.hotelAmenityRepository.insert(payload);
+
+    const data = await this.getByHotel(hotelId);
+
+    return {
+      message: 'Cập nhật tiện ích khách sạn thành công',
+      data,
+    };
+  }
+}    
+
+import { Transform } from 'class-transformer';
+import { IsBoolean, IsOptional } from 'class-validator';
+
+export class CreateHotelImageDto {
+    @IsOptional()
+    @Transform(({ value }) => value === 'true' || value === true)
+    @IsBoolean()
+    isDefault?: boolean = false;
+}
+
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateHotelImageDto } from './create-hotel-image.dto';
+
+export class UpdateHotelImageDto extends PartialType(CreateHotelImageDto) {}
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Hotel } from 'src/modules/hotels/entities/hotel.entity';
+
+@Entity({ name: 'hotel_images' })
+export class HotelImage {
+    @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
+    id!: number;
+
+    @Column({ name: 'hotel_id', type: 'bigint', unsigned: true })
+    hotelId!: number;
+
+    @ManyToOne(() => Hotel, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'hotel_id' })
+    hotel!: Hotel;
+
+    @Column({ type: 'text' })
+    url!: string;
+
+    @Column({ name: 'public_id', type: 'varchar', length: 255 })
+    publicId!: string;
+
+    @Column({ name: 'is_default', type: 'boolean', default: false })
+    isDefault!: boolean;
+
+    @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+    createdAt!: Date;
+}
+
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
+
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { HotelImagesService } from './hotel-images.service';
+import { CreateHotelImageDto } from './dto/create-hotel-image.dto';
+
+@Controller()
+export class HotelImagesController {
+  constructor(private readonly hotelImagesService: HotelImagesService) { }
+
+  @Get('hotels/:id/images')
+  getByHotel(@Param('id', ParseIntPipe) id: number) {
+    return this.hotelImagesService.getByHotel(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('admin/hotels/:id/images')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: memoryStorage(),
+      limits: { fileSize: 5 * 1024 * 1024 },
+      fileFilter: (req, file, callback) => {
+        const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+
+        if (!allowed.includes(file.mimetype)) {
+          return callback(
+            new BadRequestException('Chỉ cho phép jpg, jpeg, png, webp'),
+            false,
+          );
+        }
+
+        callback(null, true);
+      },
+    }),
+  )
+  uploadImage(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: CreateHotelImageDto,
+  ) {
+    if (!file) {
+      throw new BadRequestException('Vui lòng chọn file ảnh');
+    }
+
+    return this.hotelImagesService.uploadImage(
+      id,
+      file,
+      dto.isDefault ?? false,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('admin/hotel-images/:imageId/set-default')
+  setDefault(@Param('imageId', ParseIntPipe) imageId: number) {
+    return this.hotelImagesService.setDefault(imageId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('admin/hotel-images/:imageId')
+  delete(@Param('imageId', ParseIntPipe) imageId: number) {
+    return this.hotelImagesService.deleteImage(imageId);
+  }
+}
+
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import { Hotel } from '../hotels/entities/hotel.entity';
+import { HotelImage } from './entities/hotel-image.entity';
+import { CloudinaryService } from 'src/common/cloudinary/cloudinary.service';
+
+@Injectable()
+export class HotelImagesService {
+  constructor(
+    @InjectRepository(HotelImage)
+    private readonly hotelImageRepository: Repository<HotelImage>,
+
+    @InjectRepository(Hotel)
+    private readonly hotelRepository: Repository<Hotel>,
+
+    private readonly cloudinaryService: CloudinaryService,
+  ) { }
+
+  private async ensureHotelExists(hotelId: number) {
+    const hotel = await this.hotelRepository.findOne({
+      where: { id: hotelId },
+      select: ['id', 'name'],
+    });
+
+    if (!hotel) {
+      throw new NotFoundException('Khách sạn không tồn tại');
+    }
+
+    return hotel;
+  }
+
+  async getByHotel(hotelId: number) {
+    await this.ensureHotelExists(hotelId);
+
+    return this.hotelImageRepository.find({
+      where: { hotelId },
+      order: { isDefault: 'DESC', id: 'DESC' },
+    });
+  }
+
+  async uploadImage(
+    hotelId: number,
+    file: Express.Multer.File,
+    isDefault = false,
+  ) {
+    await this.ensureHotelExists(hotelId);
+
+    const uploaded = await this.cloudinaryService.uploadImage(
+      file,
+      `hotels/${hotelId}`,
+    );
+
+    if (isDefault) {
+      await this.hotelImageRepository.update({ hotelId }, { isDefault: false });
+    }
+
+    return this.hotelImageRepository.save({
+      hotelId,
+      url: uploaded.url,
+      publicId: uploaded.publicId,
+      isDefault,
+    });
+  }
+
+  async setDefault(imageId: number) {
+    const image = await this.hotelImageRepository.findOne({
+      where: { id: imageId },
+    });
+
+    if (!image) {
+      throw new NotFoundException('Ảnh không tồn tại');
+    }
+
+    await this.hotelImageRepository.update(
+      { hotelId: image.hotelId },
+      { isDefault: false },
+    );
+
+    await this.hotelImageRepository.update(
+      { id: imageId },
+      { isDefault: true },
+    );
+
+    return { message: 'Đặt ảnh mặc định thành công' };
+  }
+
+  async deleteImage(imageId: number) {
+    const image = await this.hotelImageRepository.findOne({
+      where: { id: imageId },
+    });
+
+    if (!image) {
+      throw new NotFoundException('Ảnh không tồn tại');
+    }
+
+    await this.cloudinaryService.deleteImage(image.publicId);
+    await this.hotelImageRepository.remove(image);
+
+    return { message: 'Xóa ảnh thành công' };
+  }
+}
+
+import {
+    IsInt,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsPhoneNumber,
+    IsString,
+    Max,
+    MaxLength,
+    Min,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class CreateHotelDto {
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    destinationId!: number;
+
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(255)
+    name!: string;
+
+    @IsOptional()
+    @IsString()
+    address?: string;
+
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber({ maxDecimalPlaces: 1 })
+    @Min(0)
+    @Max(5)
+    starRating?: number;
+
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber({ maxDecimalPlaces: 8 })
+    @Min(-90)
+    @Max(90)
+    latitude?: number;
+
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber({ maxDecimalPlaces: 8 })
+    @Min(-180)
+    @Max(180)
+    longitude?: number;
+
+    @IsOptional()
+    @IsString()
+    @MaxLength(20)
+    contactPhone?: string;
+}
+
+import { Type } from 'class-transformer';
+import {
+    IsIn,
+    IsInt,
+    IsNumber,
+    IsOptional,
+    IsString,
+    Max,
+    Min,
+} from 'class-validator';
+
+export class QueryHotelDto {
+    @IsOptional()
+    @IsString()
+    search?: string;
+
+    @IsOptional()
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    destinationId?: number;
+
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber({ maxDecimalPlaces: 1 })
+    @Min(0)
+    @Max(5)
+    starRating?: number;
+
+    @IsOptional()
+    @IsIn(['id', 'name', 'starRating', 'createdAt'])
+    sortBy?: 'id' | 'name' | 'starRating' | 'createdAt' = 'id';
+
+    @IsOptional()
+    @IsIn(['ASC', 'DESC', 'asc', 'desc'])
+    sortOrder?: 'ASC' | 'DESC' | 'asc' | 'desc' = 'DESC';
+
+    @IsOptional()
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    page?: number = 1;
+
+    @IsOptional()
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @Max(100)
+    limit?: number = 10;
+}
+
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateHotelDto } from './create-hotel.dto';
+
+export class UpdateHotelDto extends PartialType(CreateHotelDto) {}
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
+import { Destination } from 'src/modules/destinations/entities/destination.entity';
+
+@Entity({ name: 'hotels' })
+export class Hotel {
+    @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
+    id!: number;
+
+    @Column({ name: 'destination_id', type: 'bigint', unsigned: true })
+    destinationId!: number;
+
+    @ManyToOne(() => Destination, { onDelete: 'RESTRICT' })
+    @JoinColumn({ name: 'destination_id' })
+    destination!: Destination;
+
+    @Column({ type: 'varchar', length: 255 })
+    name!: string;
+
+    @Column({ type: 'text', nullable: true })
+    address!: string | null;
+
+    @Column({ name: 'star_rating', type: 'decimal', precision: 2, scale: 1, nullable: true })
+    starRating?: string | null;
+
+    @Column({ type: 'decimal', precision: 10, scale: 8, nullable: true })
+    latitude!: string | null;
+
+    @Column({ type: 'decimal', precision: 11, scale: 8, nullable: true })
+    longitude!: string | null;
+
+    @Column({ name: 'contact_phone', type: 'varchar', length: 20, nullable: true })
+    contactPhone!: string | null;
+
+    @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+    createdAt!: Date;
+
+    @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
+    updatedAt!: Date;
+}
+
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+
+import { HotelsService } from './hotels.service';
+import { CreateHotelDto } from './dto/create-hotel.dto';
+import { UpdateHotelDto } from './dto/update-hotel.dto';
+import { QueryHotelDto } from './dto/query-hotel.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+
+@Controller()
+export class HotelsController {
+  constructor(private readonly hotelsService: HotelsService) { }
+
+  @Get('hotels')
+  getPublicList(@Query() query: QueryHotelDto) {
+    return this.hotelsService.getPublicList(query);
+  }
+
+  @Get('hotels/:id')
+  getPublicDetail(@Param('id', ParseIntPipe) id: number) {
+    return this.hotelsService.getPublicDetail(id);
+  }
+
+  @Get('destinations/:destinationId/hotels')
+  getByDestination(
+    @Param('destinationId', ParseIntPipe) destinationId: number,
+    @Query() query: QueryHotelDto,
+  ) {
+    return this.hotelsService.getByDestination(destinationId, query);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('admin/hotels')
+  create(@Body() dto: CreateHotelDto) {
+    return this.hotelsService.createHotel(dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('admin/hotels/:id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateHotelDto,
+  ) {
+    return this.hotelsService.updateHotel(id, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('admin/hotels/:id')
+  delete(@Param('id', ParseIntPipe) id: number) {
+    return this.hotelsService.deleteHotel(id);
+  }
+}
+
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import { BaseCrudService } from 'src/common/base/base-crud.service';
+import { Hotel } from './entities/hotel.entity';
+import { Destination } from '../destinations/entities/destination.entity';
+import { CreateHotelDto } from './dto/create-hotel.dto';
+import { UpdateHotelDto } from './dto/update-hotel.dto';
+import { QueryHotelDto } from './dto/query-hotel.dto';
+
+@Injectable()
+export class HotelsService extends BaseCrudService<Hotel> {
+  constructor(
+    @InjectRepository(Hotel)
+    private readonly hotelRepository: Repository<Hotel>,
+
+    @InjectRepository(Destination)
+    private readonly destinationRepository: Repository<Destination>,
+  ) {
+    super(hotelRepository, 'Khách sạn');
+  }
+
+  private async ensureDestinationExists(destinationId: number) {
+    const destination = await this.destinationRepository.findOne({
+      where: { id: destinationId },
+      select: ['id', 'name'],
+    });
+
+    if (!destination) {
+      throw new BadRequestException('Điểm đến không tồn tại');
+    }
+
+    return destination;
+  }
+
+  async createHotel(dto: CreateHotelDto) {
+    await this.ensureDestinationExists(dto.destinationId);
+
+    return this.create({
+      destinationId: dto.destinationId,
+      name: dto.name.trim(),
+      address: dto.address?.trim() || null,
+      starRating:
+        dto.starRating !== undefined ? dto.starRating.toFixed(1) : null,
+      latitude:
+        dto.latitude !== undefined ? dto.latitude.toFixed(8) : null,
+      longitude:
+        dto.longitude !== undefined ? dto.longitude.toFixed(8) : null,
+      contactPhone: dto.contactPhone?.trim() || null,
+    });
+  }
+
+  async updateHotel(id: number, dto: UpdateHotelDto) {
+    const hotel = await this.findOne({ id });
+
+    if (
+      dto.destinationId !== undefined &&
+      dto.destinationId !== hotel.destinationId
+    ) {
+      await this.ensureDestinationExists(dto.destinationId);
+    }
+
+    return this.update(
+      { id },
+      {
+        destinationId: dto.destinationId ?? hotel.destinationId,
+        name: dto.name?.trim() ?? hotel.name,
+        address:
+          dto.address !== undefined ? dto.address?.trim() || null : hotel.address,
+        starRating:
+          dto.starRating !== undefined
+            ? dto.starRating.toFixed(1)
+            : hotel.starRating,
+        latitude:
+          dto.latitude !== undefined
+            ? dto.latitude.toFixed(8)
+            : hotel.latitude,
+        longitude:
+          dto.longitude !== undefined
+            ? dto.longitude.toFixed(8)
+            : hotel.longitude,
+        contactPhone:
+          dto.contactPhone !== undefined
+            ? dto.contactPhone?.trim() || null
+            : hotel.contactPhone,
+      },
+    );
+  }
+
+  async getPublicList(query: QueryHotelDto) {
+    const page = query.page || 1;
+    const limit = query.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const qb = this.hotelRepository
+      .createQueryBuilder('hotel')
+      .leftJoinAndSelect('hotel.destination', 'destination');
+
+    if (query.search?.trim()) {
+      const keyword = `%${query.search.trim()}%`;
+      qb.andWhere(
+        `
+        (
+          hotel.name LIKE :keyword
+          OR hotel.address LIKE :keyword
+          OR destination.name LIKE :keyword
+        )
+        `,
+        { keyword },
+      );
+    }
+
+    if (query.destinationId) {
+      qb.andWhere('hotel.destinationId = :destinationId', {
+        destinationId: query.destinationId,
+      });
+    }
+
+    if (query.starRating !== undefined) {
+      qb.andWhere('hotel.starRating = :starRating', {
+        starRating: query.starRating.toFixed(1),
+      });
+    }
+
+    const sortMap: Record<string, string> = {
+      id: 'hotel.id',
+      name: 'hotel.name',
+      starRating: 'hotel.starRating',
+      createdAt: 'hotel.createdAt',
+    };
+
+    const sortBy = sortMap[query.sortBy || 'id'] || 'hotel.id';
+    const sortOrder = (query.sortOrder || 'DESC').toUpperCase() as 'ASC' | 'DESC';
+
+    qb.orderBy(sortBy, sortOrder).skip(skip).take(limit);
+
+    const [data, total] = await qb.getManyAndCount();
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async getPublicDetail(id: number) {
+    return this.findOne(
+      { id },
+      {
+        relations: {
+          destination: true,
+        },
+      },
+    );
+  }
+
+  async getByDestination(destinationId: number, query: QueryHotelDto) {
+    await this.ensureDestinationExists(destinationId);
+
+    return this.getPublicList({
+      ...query,
+      destinationId,
+    });
+  }
+
+  async deleteHotel(id: number) {
+    await this.hardRemove({ id });
+
+    return {
+      message: 'Xóa khách sạn thành công',
+    };
+  }
+}   

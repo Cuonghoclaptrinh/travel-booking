@@ -1,0 +1,5 @@
+1. create() tạo booking thành công
+2. create() báo lỗi khi tour không tồn tại
+3. create() báo lỗi khi không đủ chỗ
+4. pay() báo lỗi khi chọn BANK_TRANSFER nhưng thiếu paymentReference
+5. cancel() hủy booking unpaid thì paymentStatus chuyển thành CANCELLED
