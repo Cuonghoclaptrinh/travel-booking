@@ -64,10 +64,6 @@ export class PaymentsController {
         );
     }
 
-    @Post('confirm-webhook')
-    async confirmWebhook(@Body('webhookUrl') webhookUrl: string) {
-        return this.payosClient.confirmWebhook(webhookUrl);
-    }
 
     @Post('bookings/:bookingId/mock-payos/create-url')
     @Permissions('booking.my.pay')

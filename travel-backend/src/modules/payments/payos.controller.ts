@@ -3,6 +3,7 @@ import { PaymentsService } from './payments.service';
 
 @Controller('payments/payos')
 export class PayosController {
+    payosClient: any;
     constructor(private readonly paymentsService: PaymentsService) { }
 
     @Post('webhook')
@@ -25,5 +26,10 @@ export class PayosController {
                 message: error || 'Invalid webhook',
             };
         }
+    }
+
+    @Post('confirm-webhook')
+    async confirmWebhook(@Body('webhookUrl') webhookUrl: string) {
+        return this.payosClient.confirmWebhook(webhookUrl);
     }
 }
