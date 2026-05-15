@@ -97,7 +97,7 @@ const defaultDestinationTab: DestinationTab = {
 //     'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=900&auto=format&fit=crop';
 
 const fallbackTourImage =
-    'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=900&auto=format&fit=crop';
+    'https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1200&auto=format&fit=crop';
 
 const getDestinationGridStyle = (index: number) => {
     if (index === 0) {
@@ -238,6 +238,7 @@ const HomePage: React.FC = () => {
         return (
             tour.coverImageUrl ||
             tour.defaultImageUrl ||
+            tour.images?.find((img: any) => img.isDefault)?.url ||
             tour.images?.[0]?.url ||
             fallbackTourImage
         );
@@ -426,11 +427,26 @@ const HomePage: React.FC = () => {
                                         onClick={() => navigate(`/tours/${tour.slug}`)}
                                     >
                                         <Box position="relative">
-                                            <CardMedia
+                                            {/* <CardMedia
                                                 component="img"
                                                 height="180"
                                                 image={getTourImage(tour)}
                                                 alt={tour.name}
+                                            /> */}
+                                            <CardMedia
+                                                component="img"
+                                                image={getTourImage(tour)}
+                                                alt={tour.name}
+                                                sx={{
+                                                    width: '100%',
+                                                    height: 220,
+                                                    objectFit: 'cover',
+                                                    display: 'block',
+                                                    backgroundColor: '#eee',
+                                                }}
+                                                onError={(e: any) => {
+                                                    e.currentTarget.src = fallbackTourImage;
+                                                }}
                                             />
 
                                             <Chip
@@ -585,11 +601,26 @@ const HomePage: React.FC = () => {
                                         onClick={() => navigate(`/tours/${tour.slug}`)}
                                     >
                                         <Box position="relative">
-                                            <CardMedia
+                                            {/* <CardMedia
                                                 component="img"
                                                 height="160"
                                                 image={getTourImage(tour)}
                                                 alt={tour.name}
+                                            /> */}
+                                            <CardMedia
+                                                component="img"
+                                                image={getTourImage(tour)}
+                                                alt={tour.name}
+                                                sx={{
+                                                    width: '100%',
+                                                    height: 220,
+                                                    objectFit: 'cover',
+                                                    display: 'block',
+                                                    backgroundColor: '#eee',
+                                                }}
+                                                onError={(e: any) => {
+                                                    e.currentTarget.src = fallbackTourImage;
+                                                }}
                                             />
 
                                             <Chip
