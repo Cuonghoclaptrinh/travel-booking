@@ -92,7 +92,21 @@ export default function AdminLayout() {
 
     return (
         <Layout style={{ minHeight: "100vh" }}>
-            <Sider trigger={null} collapsible collapsed={collapsed} width={240}>
+            <Sider
+                trigger={null}
+                collapsible
+                collapsed={collapsed}
+                width={240}
+                style={{
+                    position: "fixed",
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    height: "100vh",
+                    overflow: "auto",
+                    zIndex: 1000,
+                }}
+            >
                 <div
                     style={{
                         height: 64,
@@ -121,9 +135,18 @@ export default function AdminLayout() {
                 />
             </Sider>
 
-            <Layout>
+            <Layout
+                style={{
+                    marginLeft: collapsed ? 80 : 240,
+                    transition: "margin-left 0.2s",
+                    minHeight: "100vh",
+                }}
+            >
                 <Header
                     style={{
+                        position: "sticky",
+                        top: 0,
+                        zIndex: 999,
                         padding: "0 16px",
                         background: token.colorBgContainer,
                         display: "flex",

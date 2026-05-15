@@ -420,10 +420,10 @@ export class PaymentsService {
 
     await paymentRepo.save(payment);
 
-    const returnUrl = this.configService.get<string>('PAYOS_RETURN_URL');
-    const cancelUrl = this.configService.get<string>('PAYOS_CANCEL_URL');
+    const returnBaseUrl = this.configService.get<string>('PAYOS_RETURN_URL');
+    const cancelBaseUrl = this.configService.get<string>('PAYOS_CANCEL_URL');
 
-    if (!returnUrl || !cancelUrl) {
+    if (!returnBaseUrl || !cancelBaseUrl) {
       throw new BadRequestException('Missing payOS return/cancel URL');
     }
 
@@ -438,8 +438,9 @@ export class PaymentsService {
           price: amount,
         },
       ],
-      returnUrl,
-      cancelUrl,
+      returnUrl: `${returnBaseUrl}/${booking.id}`,
+
+      cancelUrl: `${cancelBaseUrl}/${booking.id}`,
     });
 
     payment.paymentUrl = paymentLink.checkoutUrl;

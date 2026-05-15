@@ -38,6 +38,19 @@ const defaultForm: CreateTourPayload = {
     isHotDeal: false,
 };
 
+const generateSlug = (text: string) => {
+    return text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'd')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+};
+
 
 export default function TourFormPage() {
     const navigate = useNavigate();
@@ -157,21 +170,50 @@ export default function TourFormPage() {
         }
     };
 
+    // const handleChange =
+    //     (field: keyof CreateTourPayload) =>
+    //         (event: React.ChangeEvent<HTMLInputElement>) => {
+    //             const value = event.target.value;
+    //             setForm((prev) => ({
+    //                 ...prev,
+    //                 [field]:
+    //                     field === 'destinationId' ||
+    //                         field === 'durationDays' ||
+    //                         field === 'durationNights'
+    //                         ? Number(value)
+    //                         : value,
+    //             }));
+    //         };
     const handleChange =
         (field: keyof CreateTourPayload) =>
             (event: React.ChangeEvent<HTMLInputElement>) => {
                 const value = event.target.value;
-                setForm((prev) => ({
-                    ...prev,
-                    [field]:
+
+                setForm((prev) => {
+                    const nextValue =
                         field === 'destinationId' ||
                             field === 'durationDays' ||
                             field === 'durationNights'
                             ? Number(value)
-                            : value,
-                }));
-            };
+                            : value;
 
+                    const nextForm = {
+                        ...prev,
+                        [field]: nextValue,
+                    };
+
+                    if (field === 'name') {
+                        nextForm.slug = generateSlug(value);
+                    }
+
+                    if (field === 'slug') {
+                        nextForm.slug = generateSlug(value);
+                    }
+
+                    return nextForm;
+                });
+            };
+            
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] || null;
         setImageFile(file);
