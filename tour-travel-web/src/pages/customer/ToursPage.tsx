@@ -110,9 +110,30 @@ export default function ToursPage() {
         fetchDestinations();
     }, []);
 
+    // useEffect(() => {
+    //     fetchTours();
+    // }, [page, searchParams]);
     useEffect(() => {
-        fetchTours();
-    }, [page, searchParams]);
+        const timer = window.setTimeout(() => {
+            fetchTours({
+                page,
+                limit: meta.limit,
+                ...buildFilterParams(),
+            });
+        }, 300);
+
+        return () => window.clearTimeout(timer);
+    }, [
+        page,
+        search,
+        destinationId,
+        budgetRange,
+        tourType,
+        durationRange,
+        feature,
+        departureTime,
+        departureDate,
+    ]);
 
     const fetchTours = async (params?: Partial<TourQueryParams>) => {
         try {
@@ -264,9 +285,9 @@ export default function ToursPage() {
         return params;
     };
 
-    const handleFilter = () => {
+    const applyFilters = (nextPage = 1) => {
         fetchTours({
-            page: 1,
+            page: nextPage,
             limit: meta.limit,
             ...buildFilterParams(),
         });
@@ -281,18 +302,18 @@ export default function ToursPage() {
         setFeature('');
         setDepartureTime('');
         setDepartureDate('');
-
-        fetchTours({
-            page: 1,
-            limit: meta.limit,
-        });
+        setPage(1);
     };
+
+    // const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
+    //     setPage(value);
+    //     const next = new URLSearchParams(searchParams);
+    //     next.set('page', String(value));
+    //     setSearchParams(next);
+    // };
 
     const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
         setPage(value);
-        const next = new URLSearchParams(searchParams);
-        next.set('page', String(value));
-        setSearchParams(next);
     };
 
     const formatMoney = (value?: string | number | null) => {
@@ -385,7 +406,7 @@ export default function ToursPage() {
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems="flex-start">
 
                 {/* Bộ lọc */}
-                <Paper
+                {/* <Paper
                     elevation={0}
                     sx={{
                         width: { xs: '100%', md: 260 },
@@ -394,15 +415,62 @@ export default function ToursPage() {
                         p: 2,
                         border: '1px solid #eef0f3',
                     }}
-                >
-                    <Typography fontWeight={900} sx={{ textTransform: 'uppercase', mb: 2 }}>
-                        Bộ lọc tìm kiếm
-                    </Typography>
+                > */}
+                <Paper
+                    elevation={0}
+                    sx={{
+                        width: { xs: '100%', md: 280 },
+                        flexShrink: 0,
+                        borderRadius: 3,
+                        p: 1.5,
+                        border: '1px solid #e2e8f0',
+                        boxShadow: '0 10px 28px rgba(15, 23, 42, 0.06)',
+                        bgcolor: '#fff',
 
-                    <Stack spacing={2}>
+                        position: { xs: 'static', md: 'sticky' },
+                        top: { md: 88 },
+                        maxHeight: { md: 'calc(100vh - 110px)' },
+                        overflowY: { md: 'auto' },
+
+                        '&::-webkit-scrollbar': {
+                            width: 6,
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                            bgcolor: '#cbd5e1',
+                            borderRadius: 999,
+                        },
+                    }}
+                >
+                    <Stack
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        sx={{ mb: 1.25 }}
+                    >
+                        <Typography fontWeight={900} fontSize={13} sx={{ textTransform: 'uppercase' }}>
+                            Bộ lọc tìm kiếm
+                        </Typography>
+
+                        <Typography
+                            onClick={handleReset}
+                            sx={{
+                                fontSize: 13,
+                                fontWeight: 800,
+                                color: '#0f766e',
+                                cursor: 'pointer',
+                                '&:hover': {
+                                    textDecoration: 'underline',
+                                },
+                            }}
+                        >
+                            Xóa
+                        </Typography>
+                    </Stack>
+
+                    <Stack spacing={1.15}>
                         {/* Từ khóa */}
                         <Box>
-                            <Typography fontSize={13} fontWeight={800} mb={1}>
+                            <Typography fontSize={12.5} fontWeight={800} mb={0.5}>
                                 Từ khóa
                             </Typography>
                             <TextField
@@ -411,20 +479,41 @@ export default function ToursPage() {
                                 placeholder="Tên tour"
                                 size="small"
                                 fullWidth
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: 2,
+                                        fontSize: 13,
+                                    },
+                                    '& .MuiInputBase-input': {
+                                        py: 0.85,
+                                    },
+                                }}
                             />
                         </Box>
 
                         {/* Điểm đến */}
                         <Box>
-                            <Typography fontSize={13} fontWeight={800} mb={1}>
+                            <Typography fontSize={12.5} fontWeight={800} mb={0.5}>
                                 Điểm đến
                             </Typography>
                             <TextField
                                 select
                                 value={destinationId}
-                                onChange={(e) => setDestinationId(e.target.value)}
+                                onChange={(e) => {
+                                    setDestinationId(e.target.value);
+                                    setPage(1);
+                                }}
                                 size="small"
                                 fullWidth
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: 2,
+                                        fontSize: 13,
+                                    },
+                                    '& .MuiInputBase-input': {
+                                        py: 0.85,
+                                    },
+                                }}
                             >
                                 <MenuItem value="">Tất cả</MenuItem>
                                 {destinations.map((item) => (
@@ -435,16 +524,28 @@ export default function ToursPage() {
                             </TextField>
                         </Box>
                         <Box>
-                            <Typography fontSize={13} fontWeight={800} mb={1}>
+                            <Typography fontSize={12.5} fontWeight={800} mb={0.5}>
                                 Ngân sách / Giá tour
                             </Typography>
 
                             <TextField
                                 select
                                 value={budgetRange}
-                                onChange={(e) => setBudgetRange(e.target.value)}
+                                onChange={(e) => {
+                                    setBudgetRange(e.target.value);
+                                    setPage(1);
+                                }}
                                 size="small"
                                 fullWidth
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: 2,
+                                        fontSize: 13,
+                                    },
+                                    '& .MuiInputBase-input': {
+                                        py: 0.85,
+                                    },
+                                }}
                             >
                                 {budgetOptions.map((item) => (
                                     <MenuItem key={item.value} value={item.value}>
@@ -455,16 +556,28 @@ export default function ToursPage() {
                         </Box>
 
                         <Box>
-                            <Typography fontSize={13} fontWeight={800} mb={1}>
+                            <Typography fontSize={12.5} fontWeight={800} mb={0.5}>
                                 Loại tour / Dòng tour
                             </Typography>
 
                             <TextField
                                 select
                                 value={tourType}
-                                onChange={(e) => setTourType(e.target.value)}
+                                onChange={(e) => {
+                                    setTourType(e.target.value);
+                                    setPage(1);
+                                }}
                                 size="small"
                                 fullWidth
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: 2,
+                                        fontSize: 13,
+                                    },
+                                    '& .MuiInputBase-input': {
+                                        py: 0.85,
+                                    },
+                                }}
                             >
                                 {tourTypeOptions.map((item) => (
                                     <MenuItem key={item.value} value={item.value}>
@@ -475,16 +588,28 @@ export default function ToursPage() {
                         </Box>
 
                         <Box>
-                            <Typography fontSize={13} fontWeight={800} mb={1}>
+                            <Typography fontSize={12.5} fontWeight={800} mb={0.5}>
                                 Thời gian / Thời lượng tour
                             </Typography>
 
                             <TextField
                                 select
                                 value={durationRange}
-                                onChange={(e) => setDurationRange(e.target.value)}
+                                onChange={(e) => {
+                                    setDurationRange(e.target.value);
+                                    setPage(1);
+                                }}
                                 size="small"
                                 fullWidth
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: 2,
+                                        fontSize: 13,
+                                    },
+                                    '& .MuiInputBase-input': {
+                                        py: 0.85,
+                                    },
+                                }}
                             >
                                 {durationOptions.map((item) => (
                                     <MenuItem key={item.value} value={item.value}>
@@ -495,16 +620,28 @@ export default function ToursPage() {
                         </Box>
 
                         <Box>
-                            <Typography fontSize={13} fontWeight={800} mb={1}>
+                            <Typography fontSize={12.5} fontWeight={800} mb={0.5}>
                                 Thể loại / Đặc điểm tour
                             </Typography>
 
                             <TextField
                                 select
                                 value={feature}
-                                onChange={(e) => setFeature(e.target.value)}
+                                onChange={(e) => {
+                                    setFeature(e.target.value);
+                                    setPage(1);
+                                }}
                                 size="small"
                                 fullWidth
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: 2,
+                                        fontSize: 13,
+                                    },
+                                    '& .MuiInputBase-input': {
+                                        py: 0.85,
+                                    },
+                                }}
                             >
                                 {featureOptions.map((item) => (
                                     <MenuItem key={item.value} value={item.value}>
@@ -515,7 +652,7 @@ export default function ToursPage() {
                         </Box>
 
                         <Box>
-                            <Typography fontSize={13} fontWeight={800} mb={1}>
+                            <Typography fontSize={12.5} fontWeight={800} mb={0.5}>
                                 Thời gian khởi hành / Ngày đi
                             </Typography>
 
@@ -524,6 +661,7 @@ export default function ToursPage() {
                                 value={departureTime}
                                 onChange={(e) => {
                                     setDepartureTime(e.target.value);
+                                    setPage(1);
 
                                     if (e.target.value !== 'custom') {
                                         setDepartureDate('');
@@ -531,6 +669,15 @@ export default function ToursPage() {
                                 }}
                                 size="small"
                                 fullWidth
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: 2,
+                                        fontSize: 13,
+                                    },
+                                    '& .MuiInputBase-input': {
+                                        py: 0.85,
+                                    },
+                                }}
                             >
                                 {departureTimeOptions.map((item) => (
                                     <MenuItem key={item.value} value={item.value}>
@@ -542,26 +689,38 @@ export default function ToursPage() {
 
                         {departureTime === 'custom' && (
                             <Box>
-                                <Typography fontSize={13} fontWeight={800} mb={1}>
+                                <Typography fontSize={12.5} fontWeight={800} mb={0.5}>
                                     Chọn ngày đi
                                 </Typography>
 
                                 <TextField
                                     type="date"
                                     value={departureDate}
-                                    onChange={(e) => setDepartureDate(e.target.value)}
+                                    onChange={(e) => {
+                                        setDepartureDate(e.target.value);
+                                        setPage(1);
+                                    }}
                                     size="small"
                                     fullWidth
+                                    sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: 2,
+                                            fontSize: 13,
+                                        },
+                                        '& .MuiInputBase-input': {
+                                            py: 0.85,
+                                        },
+                                    }}
                                 />
                             </Box>
                         )}
 
-                        <Button variant="contained" onClick={handleFilter} sx={{ textTransform: 'none', fontWeight: 800 }}>
+                        {/* <Button variant="contained" onClick={handleFilter} sx={{ textTransform: 'none', fontWeight: 800 }}>
                             Áp dụng
                         </Button>
                         <Button variant="outlined" onClick={handleReset} sx={{ textTransform: 'none', fontWeight: 800 }}>
                             Đặt lại
-                        </Button>
+                        </Button> */}
                     </Stack>
                 </Paper>
 

@@ -7,21 +7,33 @@ export default function RegisterPage() {
     return (
         <Paper className="register-page" elevation={8}>
             <Typography className="register-page__subtitle">Tour Travel</Typography>
+
             <Typography variant="h4" className="register-page__title">
                 Đăng ký
             </Typography>
 
-            <Stack className="register-page__form" spacing={2}>
-                <TextField label="Họ và tên" fullWidth />
-                <TextField label="Email" type="email" fullWidth />
-                <TextField label="Số điện thoại" fullWidth />
-                <TextField label="Mật khẩu" type="password" fullWidth />
-                <TextField label="Xác nhận mật khẩu" type="password" fullWidth />
+            <Stack className="register-page__form" spacing={1.6}>
+                <TextField label="Họ và tên" fullWidth size="small" />
+                <TextField label="Email" type="email" fullWidth size="small" />
+                <TextField label="Số điện thoại" fullWidth size="small" />
+                <TextField label="Mật khẩu" type="password" fullWidth size="small" />
+                <TextField label="Xác nhận mật khẩu" type="password" fullWidth size="small" />
 
-                <Button variant="contained" size="large" fullWidth>
+                <Button
+                    className="register-page__submit"
+                    variant="contained"
+                    size="large"
+                    fullWidth
+                >
                     Đăng ký
                 </Button>
+
+                <div className="register-page__divider">
+                    <span>hoặc</span>
+                </div>
+
                 <Button
+                    className="register-page__google"
                     variant="outlined"
                     size="large"
                     fullWidth
@@ -33,7 +45,7 @@ export default function RegisterPage() {
             </Stack>
 
             <Typography className="register-page__footer">
-                Đã có tài khoản? <Link to="/login">Đăng nhập</Link>
+                Đã có tài khoản? <Link to="/auth/login">Đăng nhập</Link>
             </Typography>
         </Paper>
     );

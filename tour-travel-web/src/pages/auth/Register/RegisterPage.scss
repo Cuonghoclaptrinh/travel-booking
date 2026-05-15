@@ -1,37 +1,149 @@
 .register-page {
     width: 100%;
     max-width: 520px;
-    padding: 32px !important;
-    border-radius: 24px !important;
-    background: rgba(255, 255, 255, 0.95) !important;
+    padding: 34px 36px !important;
+    border-radius: 28px !important;
+
+    background: rgba(255, 255, 255, 0.94) !important;
+    backdrop-filter: blur(18px);
+    border: 1px solid rgba(15, 118, 110, 0.12);
+    box-shadow:
+        0 24px 70px rgba(15, 23, 42, 0.18),
+        0 4px 18px rgba(15, 118, 110, 0.08) !important;
 
     &__subtitle {
         margin-bottom: 8px !important;
         text-align: center;
-        color: #1976d2;
-        font-weight: 600 !important;
+        color: #0f766e;
+        font-weight: 900 !important;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 1.4px;
+        font-size: 13px !important;
     }
 
     &__title {
         margin-bottom: 24px !important;
         text-align: center;
-        font-weight: 700 !important;
+        font-weight: 900 !important;
+        color: #1f2937;
+        letter-spacing: -0.4px;
     }
 
     &__form {
-        margin-bottom: 20px;
+        margin-bottom: 22px;
+
+        .MuiTextField-root {
+            .MuiOutlinedInput-root {
+                border-radius: 14px;
+                background: #f8fafc;
+                transition: all 0.2s ease;
+
+                fieldset {
+                    border-color: rgba(15, 118, 110, 0.14);
+                }
+
+                &:hover fieldset {
+                    border-color: rgba(15, 118, 110, 0.35);
+                }
+
+                &.Mui-focused {
+                    background: #ffffff;
+
+                    fieldset {
+                        border-color: #0f766e;
+                        border-width: 1.5px;
+                    }
+                }
+            }
+
+            .MuiInputLabel-root {
+                color: #6b7280;
+                font-weight: 600;
+
+                &.Mui-focused {
+                    color: #0f766e;
+                }
+            }
+
+            .MuiInputBase-input {
+                color: #1f2937;
+                font-weight: 600;
+                padding-top: 12px;
+                padding-bottom: 12px;
+            }
+        }
+    }
+
+    &__submit {
+        height: 46px;
+        border-radius: 14px !important;
+        background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%) !important;
+        color: #ffffff !important;
+        font-weight: 800 !important;
+        text-transform: none !important;
+        box-shadow: 0 10px 24px rgba(15, 118, 110, 0.28) !important;
+
+        &:hover {
+            background: linear-gradient(135deg, #0f4f4a 0%, #0f766e 100%) !important;
+            box-shadow: 0 12px 28px rgba(15, 118, 110, 0.34) !important;
+        }
+    }
+
+    &__divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #94a3b8;
+        font-size: 13px;
+        font-weight: 700;
+        margin: 2px 0;
+
+        &::before,
+        &::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: rgba(15, 118, 110, 0.14);
+        }
+    }
+
+    &__google {
+        height: 46px;
+        border-radius: 14px !important;
+        color: #1f2937 !important;
+        border-color: rgba(15, 118, 110, 0.22) !important;
+        background: #ffffff !important;
+        font-weight: 800 !important;
+        text-transform: none !important;
+
+        &:hover {
+            border-color: #0f766e !important;
+            background: #f0fdfa !important;
+            color: #0f766e !important;
+        }
     }
 
     &__footer {
         text-align: center;
         font-size: 14px !important;
+        color: #6b7280;
 
         a {
-            color: #1976d2;
-            font-weight: 600;
+            color: #0f766e;
+            font-weight: 800;
             text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
         }
+    }
+}
+
+@media (max-width: 560px) {
+    .register-page {
+        max-width: calc(100vw - 28px);
+        padding: 26px 22px !important;
+        border-radius: 22px !important;
     }
 }

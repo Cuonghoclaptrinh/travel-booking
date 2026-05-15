@@ -40,4 +40,8 @@ export class PayosClient {
     verifyWebhook(body: any) {
         return this.payOS.webhooks.verify(body);
     }
+
+    confirmWebhook(webhookUrl: string) {
+        return this.payOS.webhooks.confirm(webhookUrl);
+    }
 }

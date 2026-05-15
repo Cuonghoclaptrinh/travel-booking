@@ -456,19 +456,196 @@ export class PaymentsService {
     };
   }
 
+  // async handlePayosWebhook(body: any) {
+  //   let verifiedData: any;
+
+  //   try {
+  //     verifiedData = this.payosClient.verifyWebhook(body);
+  //   } catch {
+  //     return {
+  //       success: false,
+  //       message: 'Invalid payOS webhook signature',
+  //     };
+  //   }
+
+  //   const orderCode = verifiedData?.orderCode || body?.data?.orderCode;
+
+  //   if (!orderCode) {
+  //     return {
+  //       success: false,
+  //       message: 'Missing orderCode',
+  //     };
+  //   }
+
+  //   let emailPayload:
+  //     | {
+  //       to: string;
+  //       customerName: string;
+  //       bookingCode: string;
+  //       tourName: string;
+  //       amount: string | number;
+  //       paymentMethod?: string;
+  //       paidAt?: Date | string;
+  //     }
+  //     | null = null;
+
+  //   const result = await this.dataSource.transaction(async (manager) => {
+  //     const bookingRepo = manager.getRepository(Booking);
+  //     const paymentRepo = manager.getRepository(PaymentTransaction);
+
+  //     const payment = await paymentRepo.findOne({
+  //       where: {
+  //         transactionRef: String(orderCode),
+  //         provider: PaymentProvider.PAYOS,
+  //       },
+  //     });
+
+  //     if (!payment) {
+  //       return {
+  //         success: false,
+  //         message: 'Payment transaction not found',
+  //       };
+  //     }
+
+  //     if (payment.status === PaymentTransactionStatus.SUCCESS) {
+  //       return {
+  //         success: true,
+  //         message: 'Payment already confirmed',
+  //       };
+  //     }
+
+  //     const booking = await bookingRepo.findOne({
+  //       where: {
+  //         id: payment.bookingId,
+  //       },
+  //       relations: {
+  //         user: true,
+  //         tour: true,
+  //       },
+  //     });
+
+  //     if (!booking) {
+  //       return {
+  //         success: false,
+  //         message: 'Booking not found',
+  //       };
+  //     }
+
+  //     const isSuccess =
+  //       body?.success === true &&
+  //       String(body?.code) === '00';
+
+  //     payment.rawIpn = body;
+  //     payment.providerTransactionId =
+  //       verifiedData?.reference ||
+  //       body?.data?.reference ||
+  //       body?.data?.paymentLinkId ||
+  //       undefined;
+
+  //     if (!isSuccess) {
+  //       payment.status = PaymentTransactionStatus.FAILED;
+  //       await paymentRepo.save(payment);
+
+  //       this.realtimeGateway.emitPaymentUpdatedToUser(booking.userId, {
+  //         bookingId: booking.id,
+  //         bookingCode: booking.code,
+  //         paymentId: payment.id,
+  //         transactionRef: payment.transactionRef,
+  //         providerTransactionId: payment.providerTransactionId,
+  //         paymentStatus: booking.paymentStatus,
+  //         bookingStatus: booking.bookingStatus,
+  //         paymentMethod: booking.paymentMethod,
+  //         message: 'payOS payment failed',
+  //       });
+
+  //       return {
+  //         success: true,
+  //         message: 'Payment failed handled',
+  //       };
+  //     }
+
+  //     const paidAt = new Date();
+
+  //     payment.status = PaymentTransactionStatus.SUCCESS;
+  //     payment.paidAt = paidAt;
+
+  //     booking.paymentStatus = PaymentStatus.PAID;
+  //     booking.bookingStatus = BookingStatus.CONFIRMED;
+  //     booking.paymentMethod = PaymentProvider.PAYOS as any;
+  //     booking.paymentReference =
+  //       payment.providerTransactionId || payment.transactionRef;
+  //     booking.paidAt = paidAt;
+
+  //     await paymentRepo.save(payment);
+  //     await bookingRepo.save(booking);
+
+  //     this.realtimeGateway.emitPaymentUpdatedToUser(booking.userId, {
+  //       bookingId: booking.id,
+  //       bookingCode: booking.code,
+  //       paymentId: payment.id,
+  //       transactionRef: payment.transactionRef,
+  //       providerTransactionId: payment.providerTransactionId,
+  //       paymentStatus: booking.paymentStatus,
+  //       bookingStatus: booking.bookingStatus,
+  //       paymentMethod: booking.paymentMethod,
+  //       message: 'payOS payment successful',
+  //     });
+
+  //     this.realtimeGateway.emitBookingUpdatedToUser(booking.userId, {
+  //       bookingId: booking.id,
+  //       bookingCode: booking.code,
+  //       bookingStatus: booking.bookingStatus,
+  //       paymentStatus: booking.paymentStatus,
+  //     });
+
+  //     const emailTo = booking.contactEmail || booking.user?.email;
+
+  //     if (emailTo) {
+  //       emailPayload = {
+  //         to: emailTo,
+  //         customerName:
+  //           booking.contactName || booking.user?.name || 'Quý khách',
+  //         bookingCode: booking.code,
+  //         tourName: booking.tour?.name || 'Tour du lịch',
+  //         amount: payment.amount,
+  //         paymentMethod: PaymentProvider.PAYOS,
+  //         paidAt,
+  //       };
+  //     }
+
+  //     return {
+  //       success: true,
+  //       message: 'Payment confirmed',
+  //     };
+  //   });
+
+  //   if (emailPayload) {
+  //     void this.mailService.sendPaymentSuccessEmail(emailPayload);
+  //   }
+
+  //   return result;
+  // }
+
   async handlePayosWebhook(body: any) {
+    console.log('PAYOS WEBHOOK BODY:', JSON.stringify(body, null, 2));
+
     let verifiedData: any;
 
     try {
       verifiedData = this.payosClient.verifyWebhook(body);
-    } catch {
+      console.log('PAYOS VERIFIED DATA:', JSON.stringify(verifiedData, null, 2));
+    } catch (error: any) {
+      console.error('PAYOS VERIFY ERROR:', error?.message || error);
+
       return {
         success: false,
         message: 'Invalid payOS webhook signature',
       };
     }
 
-    const orderCode = verifiedData?.orderCode || body?.data?.orderCode;
+    const orderCode =
+      verifiedData?.orderCode ||
+      body?.data?.orderCode;
 
     if (!orderCode) {
       return {
@@ -499,6 +676,9 @@ export class PaymentsService {
           provider: PaymentProvider.PAYOS,
         },
       });
+
+      console.log('PAYOS ORDER CODE:', orderCode);
+      console.log('FOUND PAYMENT:', payment?.id || null);
 
       if (!payment) {
         return {
@@ -546,17 +726,21 @@ export class PaymentsService {
         payment.status = PaymentTransactionStatus.FAILED;
         await paymentRepo.save(payment);
 
-        this.realtimeGateway.emitPaymentUpdatedToUser(booking.userId, {
-          bookingId: booking.id,
-          bookingCode: booking.code,
-          paymentId: payment.id,
-          transactionRef: payment.transactionRef,
-          providerTransactionId: payment.providerTransactionId,
-          paymentStatus: booking.paymentStatus,
-          bookingStatus: booking.bookingStatus,
-          paymentMethod: booking.paymentMethod,
-          message: 'payOS payment failed',
-        });
+        try {
+          this.realtimeGateway.emitPaymentUpdatedToUser(booking.userId, {
+            bookingId: booking.id,
+            bookingCode: booking.code,
+            paymentId: payment.id,
+            transactionRef: payment.transactionRef,
+            providerTransactionId: payment.providerTransactionId,
+            paymentStatus: booking.paymentStatus,
+            bookingStatus: booking.bookingStatus,
+            paymentMethod: booking.paymentMethod,
+            message: 'payOS payment failed',
+          });
+        } catch (error) {
+          console.error('SOCKET EMIT ERROR:', error);
+        }
 
         return {
           success: true,
@@ -579,24 +763,28 @@ export class PaymentsService {
       await paymentRepo.save(payment);
       await bookingRepo.save(booking);
 
-      this.realtimeGateway.emitPaymentUpdatedToUser(booking.userId, {
-        bookingId: booking.id,
-        bookingCode: booking.code,
-        paymentId: payment.id,
-        transactionRef: payment.transactionRef,
-        providerTransactionId: payment.providerTransactionId,
-        paymentStatus: booking.paymentStatus,
-        bookingStatus: booking.bookingStatus,
-        paymentMethod: booking.paymentMethod,
-        message: 'payOS payment successful',
-      });
+      try {
+        this.realtimeGateway.emitPaymentUpdatedToUser(booking.userId, {
+          bookingId: booking.id,
+          bookingCode: booking.code,
+          paymentId: payment.id,
+          transactionRef: payment.transactionRef,
+          providerTransactionId: payment.providerTransactionId,
+          paymentStatus: booking.paymentStatus,
+          bookingStatus: booking.bookingStatus,
+          paymentMethod: booking.paymentMethod,
+          message: 'payOS payment successful',
+        });
 
-      this.realtimeGateway.emitBookingUpdatedToUser(booking.userId, {
-        bookingId: booking.id,
-        bookingCode: booking.code,
-        bookingStatus: booking.bookingStatus,
-        paymentStatus: booking.paymentStatus,
-      });
+        this.realtimeGateway.emitBookingUpdatedToUser(booking.userId, {
+          bookingId: booking.id,
+          bookingCode: booking.code,
+          bookingStatus: booking.bookingStatus,
+          paymentStatus: booking.paymentStatus,
+        });
+      } catch (error) {
+        console.error('SOCKET EMIT ERROR:', error);
+      }
 
       const emailTo = booking.contactEmail || booking.user?.email;
 
@@ -620,7 +808,11 @@ export class PaymentsService {
     });
 
     if (emailPayload) {
-      void this.mailService.sendPaymentSuccessEmail(emailPayload);
+      this.mailService
+        .sendPaymentSuccessEmail(emailPayload)
+        .catch((error) => {
+          console.error('SEND PAYMENT EMAIL ERROR:', error);
+        });
     }
 
     return result;

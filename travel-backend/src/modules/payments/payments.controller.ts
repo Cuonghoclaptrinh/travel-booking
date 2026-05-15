@@ -19,6 +19,7 @@ import { Permissions } from '../access-control/decorators/permissions.decorator'
 @Controller('payments')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 export class PaymentsController {
+    payosClient: any;
     constructor(private readonly paymentsService: PaymentsService) { }
 
     @Post('bookings/:bookingId/vnpay/create-url')
@@ -61,6 +62,11 @@ export class PaymentsController {
             user.userId,
             bookingId,
         );
+    }
+
+    @Post('confirm-webhook')
+    async confirmWebhook(@Body('webhookUrl') webhookUrl: string) {
+        return this.payosClient.confirmWebhook(webhookUrl);
     }
 
     @Post('bookings/:bookingId/mock-payos/create-url')

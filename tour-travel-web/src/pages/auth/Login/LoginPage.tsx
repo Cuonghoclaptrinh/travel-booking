@@ -92,6 +92,7 @@ export default function LoginPage() {
                 {error && <Alert severity="error">{error}</Alert>}
 
                 <Button
+                    className="login-page__submit"
                     variant="contained"
                     size="large"
                     fullWidth
@@ -100,7 +101,13 @@ export default function LoginPage() {
                 >
                     {submitting ? "Đang đăng nhập..." : "Đăng nhập"}
                 </Button>
+
+                <div className="login-page__divider">
+                    <span>hoặc</span>
+                </div>
+
                 <Button
+                    className="login-page__google"
                     variant="outlined"
                     size="large"
                     fullWidth

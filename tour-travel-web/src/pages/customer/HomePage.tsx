@@ -755,29 +755,69 @@ const HomePage: React.FC = () => {
                             </Typography>
                         </Box>
                     ) : (
-                        <Grid container spacing={2}>
-                            {destinations.map((destination, index) => {
-                                const layout = getDestinationGridStyle(index);
-                                const image =
-                                    destination.defaultImageUrl || fallbackTourImage;
+                        <Box
+                            sx={{
+                                display: 'grid',
+                                gridTemplateColumns: {
+                                    xs: '1fr',
+                                    sm: 'repeat(2, 1fr)',
+                                    md: 'repeat(3, 1fr)',
+                                },
+                                gridTemplateAreas: {
+                                    xs: `
+                "item0"
+                "item1"
+                "item2"
+                "item3"
+                "item4"
+                "item5"
+                "item6"
+                "item7"
+            `,
+                                    sm: `
+                "item0 item0"
+                "item1 item2"
+                "item3 item4"
+                "item5 item6"
+                "item7 item7"
+            `,
+                                    md: `
+                "item0 item1 item2"
+                "item0 item3 item2"
+                "item4 item5 item6"
+                "item7 item7 item6"
+            `,
+                                },
+                                gap: 2,
+                                gridAutoRows: {
+                                    xs: '180px',
+                                    sm: '170px',
+                                    md: '145px',
+                                },
+                            }}
+                        >
+                            {destinations.slice(0, 8).map((destination, index) => {
+                                const image = destination.defaultImageUrl || fallbackTourImage;
 
                                 return (
-                                    <Grid
-                                        size={layout.gridSize}
+                                    <Box
                                         key={destination.id}
+                                        sx={{
+                                            gridArea: `item${index}`,
+                                            minWidth: 0,
+                                        }}
                                     >
                                         <DestinationBox
                                             name={destination.name}
-                                            // country={destination.country}
                                             {...(destination.country ? { country: destination.country } : {})}
                                             image={image}
-                                            height={layout.height}
+                                            height="100%"
                                             onClick={() => handleDestinationClick(destination)}
                                         />
-                                    </Grid>
+                                    </Box>
                                 );
                             })}
-                        </Grid>
+                        </Box>
                     )}
                 </Container>
             </Box>
@@ -819,7 +859,7 @@ const HomePage: React.FC = () => {
             </Box>
 
             {/* NEWSLETTER */}
-            
+
         </Box>
     );
 };
@@ -835,7 +875,7 @@ const DestinationBox = ({
     name: string;
     country?: string;
     image: string;
-    height: number;
+    height: number | string;
     onClick?: () => void;
 }) => (
     <Box
