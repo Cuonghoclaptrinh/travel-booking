@@ -23,6 +23,7 @@ export interface IRegisterPayload {
     password: string;
 }
 
+
 export interface ILoginResponse {
     user: Partial<IUser>;
     accessToken: string;
@@ -37,6 +38,10 @@ export interface IAuthContext {
     logout: () => void;
     fetchMe: () => Promise<IUser>;
     setUser: React.Dispatch<React.SetStateAction<IUser | null>>;
+    setAuth: (
+        accessToken: string,
+        user: IUser
+    ) => void;
 }
 
 export interface IUpdateMePayload {

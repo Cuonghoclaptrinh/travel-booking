@@ -11,7 +11,7 @@ import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
     cors: {
-        origin: [process.env.FRONTEND_URL || '', 'http://localhost:5173'],
+        origin: [process.env.FRONTEND_URL, 'http://localhost:5173'],
         credentials: true,
     },
 })
@@ -32,6 +32,8 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
         @MessageBody() data: { userId: number },
         @ConnectedSocket() client: Socket,
     ) {
+        console.log("USER JOIN ROOM", data);
+        console.log("ROOM NAME", `user:${data.userId}`);
         const room = `user:${data.userId}`;
         client.join(room);
         return { joined: room };
@@ -62,6 +64,9 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     }
 
     emitPaymentUpdatedToUser(userId: number, payload: any) {
+        console.log("EMIT PAYMENT EVENT");
+        console.log("TARGET ROOM", `user:${userId}`);
+        console.log("PAYLOAD", payload);
         this.server.to(`user:${userId}`).emit('payment.updated', payload);
     }
 

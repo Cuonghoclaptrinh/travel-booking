@@ -30,6 +30,7 @@ export function useAdminSocket(
         };
         socket.on('departure.slots_updated', handleSlotsUpdated);
 
+
         // Cleanup khi component unmount
         return () => {
             socket.off('booking.created', handleBookingCreated);

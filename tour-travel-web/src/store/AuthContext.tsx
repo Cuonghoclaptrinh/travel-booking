@@ -227,6 +227,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
         [saveAuth]
     );
 
+    const setAuth = useCallback(
+        (accessToken: string, currentUser: IUser) => {
+            saveAuth(accessToken, currentUser);
+        },
+        [saveAuth]
+    );
+
     const logout = useCallback(async () => {
         try {
             await authService.logout();
@@ -267,6 +274,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             logout,
             fetchMe,
             setUser,
+            setAuth
         }),
         [token, user, loading, login, logout, fetchMe, setUser]
     );

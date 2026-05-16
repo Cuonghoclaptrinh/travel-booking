@@ -272,17 +272,28 @@ export default function TourBookingDetailPage() {
         const handleBookingCreated = () => fetchDepartures();
         const handleSlotsUpdated = () => fetchDepartures();
         const handleBookingUpdated = () => fetchDepartures();
+        const handlePaymentUpdated = (payload: any) => {
+            console.log("ADMIN payment.updated", payload);
+
+            fetchDepartures();
+
+            if (selectedDepartureId) {
+                fetchDepartureBookings(selectedDepartureId);
+            }
+        };
 
         socket.on('booking.created', handleBookingCreated);
         socket.on('departure.slots_updated', handleSlotsUpdated);
         socket.on('booking.updated', handleBookingUpdated);
+        socket.on('payment.updated', handlePaymentUpdated);
 
         return () => {
             socket.off('booking.created', handleBookingCreated);
             socket.off('departure.slots_updated', handleSlotsUpdated);
             socket.off('booking.updated', handleBookingUpdated);
+            socket.off('payment.updated', handlePaymentUpdated);
         };
-    }, [tourId]);
+    }, [tourId, selectedDepartureId]);
 
     const summary = useMemo(() => {
         const totalBookings = departures.reduce((sum, item) => sum + item.totalBookings, 0);

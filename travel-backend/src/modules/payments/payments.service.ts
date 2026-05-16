@@ -1001,6 +1001,11 @@ export class PaymentsService {
       await paymentRepo.save(payment);
       await bookingRepo.save(booking);
 
+
+      console.log('EMIT PAYMENT', {
+        userId: booking.userId,
+        bookingId: booking.id,
+      });
       this.realtimeGateway.emitPaymentUpdatedToUser(booking.userId, {
         bookingId: booking.id,
         bookingCode: booking.code,
@@ -1011,6 +1016,7 @@ export class PaymentsService {
         bookingStatus: booking.bookingStatus,
         paymentMethod: booking.paymentMethod,
         message: 'payOS demo payment successful',
+
       });
 
       this.realtimeGateway.emitBookingUpdatedToUser(booking.userId, {

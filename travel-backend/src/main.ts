@@ -5,10 +5,17 @@ import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const allowedOrigins = (process.env.FRONTEND_URL ?? 'http://localhost:5173')
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean);
+
+  // const allowedOrigins = (process.env.FRONTEND_URL ?? 'http://localhost:5173')
+  //   .split(',')
+  //   .map((origin) => origin.trim())
+  //   .filter(Boolean);
+
+  const allowedOrigins = [
+    'http://localhost:5173',
+    process.env.FRONTEND_URL,
+  ].filter(Boolean);
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

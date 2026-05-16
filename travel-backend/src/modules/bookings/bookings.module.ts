@@ -28,6 +28,7 @@ import { MailModule } from '../mail/mail.module';
             PaymentTransaction,
         ]),
         MailModule,
+        RealtimeModule
     ],
     controllers: [BookingsController, AdminBookingsController, AdminBookingOverviewController,],
     providers: [BookingsService, PermissionsGuard, RealtimeGateway, BookingCronService],

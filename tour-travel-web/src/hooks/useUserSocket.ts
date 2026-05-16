@@ -8,18 +8,20 @@ export function useUserSocket(
 ) {
     useEffect(() => {
         if (!userId) return;
-
+        console.log("JOIN USER ROOM", userId);
         // Join room của user
         socket.emit('join_user_room', { userId });
 
         // Lắng nghe payment
         const handlePaymentUpdated = (payload: any) => {
+            console.log("PAYMENT UPDATED RECEIVED", payload);
             if (onPaymentUpdated) onPaymentUpdated(payload);
         };
         socket.on('payment.updated', handlePaymentUpdated);
 
         // Lắng nghe booking update (ví dụ expire)
         const handleBookingUpdated = (payload: any) => {
+            console.log("BOOKING UPDATED RECEIVED", payload);
             if (onBookingUpdated) onBookingUpdated(payload);
         };
         socket.on('booking.updated', handleBookingUpdated);

@@ -74,7 +74,10 @@ export class BookingsService {
         private readonly realtimeGateway: RealtimeGateway,
 
         private readonly mailService: MailService,
-    ) { }
+    ) {
+
+        console.log('BookingCronService initialized');
+    }
 
     async create(
         user: { userId: number; email: string; name: string },
@@ -664,6 +667,11 @@ export class BookingsService {
                 departure: departureInfo,
             };
         });
+    }
+
+    @Cron(CronExpression.EVERY_MINUTE)
+    async expireBookings() {
+        console.log('Cron running');
     }
 
     async expireBookingByAdmin(id: number) {
