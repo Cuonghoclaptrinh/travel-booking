@@ -728,7 +728,7 @@ export class PaymentsService {
         await paymentRepo.save(payment);
 
         try {
-          this.realtimeGateway.emitPaymentUpdatedToUser(booking.userId, {
+          const payload = {
             bookingId: booking.id,
             bookingCode: booking.code,
             paymentId: payment.id,
@@ -738,7 +738,10 @@ export class PaymentsService {
             bookingStatus: booking.bookingStatus,
             paymentMethod: booking.paymentMethod,
             message: 'payOS payment failed',
-          });
+          };
+
+          this.realtimeGateway.emitPaymentUpdatedToUser(booking.userId, payload);
+          this.realtimeGateway.emitPaymentUpdatedToAdmin(payload);
         } catch (error) {
           console.error('SOCKET EMIT ERROR:', error);
         }
@@ -765,7 +768,7 @@ export class PaymentsService {
       await bookingRepo.save(booking);
 
       try {
-        this.realtimeGateway.emitPaymentUpdatedToUser(booking.userId, {
+        const payload = {
           bookingId: booking.id,
           bookingCode: booking.code,
           paymentId: payment.id,
@@ -775,7 +778,10 @@ export class PaymentsService {
           bookingStatus: booking.bookingStatus,
           paymentMethod: booking.paymentMethod,
           message: 'payOS payment successful',
-        });
+        };
+
+        this.realtimeGateway.emitPaymentUpdatedToUser(booking.userId, payload);
+        this.realtimeGateway.emitPaymentUpdatedToAdmin(payload);
 
         this.realtimeGateway.emitBookingUpdatedToUser(booking.userId, {
           bookingId: booking.id,

@@ -5,7 +5,8 @@ import { socket } from '../socket';
 export function useAdminSocket(
     departureId?: number | null,
     onDepartureUpdated?: () => void, // callback khi booking/departure thay đổi
-    onBookingCreated?: () => void
+    onBookingCreated?: () => void,
+    onPaymentUpdated?: (payload: any) => void,
 ) {
     useEffect(() => {
         // 1. Join room admin
@@ -29,6 +30,12 @@ export function useAdminSocket(
             if (onDepartureUpdated) onDepartureUpdated();
         };
         socket.on('departure.slots_updated', handleSlotsUpdated);
+
+        const handlePaymentUpdated = (payload: any) => {
+            console.log('ADMIN PAYMENT UPDATED:', payload);
+            if (onPaymentUpdated) onPaymentUpdated(payload);
+        };
+        socket.on('payment.updated', handlePaymentUpdated);
 
 
         // Cleanup khi component unmount

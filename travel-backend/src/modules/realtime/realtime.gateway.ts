@@ -73,4 +73,12 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     emitDepartureSlotsUpdated(departureId: number, payload: any) {
         this.server.to(`departure:${departureId}`).emit('departure.slots_updated', payload);
     }
+
+    emitPaymentUpdatedToAdmin(payload: any) {
+        console.log("EMIT PAYMENT EVENT TO ADMIN");
+        console.log("TARGET ROOM", "admins");
+        console.log("PAYLOAD", payload);
+
+        this.server.to('admins').emit('payment.updated', payload);
+    }
 }
